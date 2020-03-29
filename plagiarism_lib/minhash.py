@@ -6,6 +6,7 @@ Created on Fri Oct  6 08:16:15 2017
 @author: hcorrada
 """
 import numpy as np
+import pandas as pd
 from collections import defaultdict
 from plagiarism_lib.hashing import _make_hashes
 
@@ -67,10 +68,16 @@ def _make_minhash_sigmatrix(shingled_data, num_hashes, inverted=False):
     last_s = -1
     hashvals = []
     
-    # iterate over shingles 
+    # iterate over shingles
     for s, docid in inv_index:
-        
-        ## IMPLEMENT THIS LOOP!!!
+        # s is a tuple (shingle, docid), docid is a doc where it appears
+        # is this equivalent to iterating the cells of characteristic matrix that have a 1?
+        last_s += 1
+        #if s[1] == docid:
+        doc_index = docids.index(docid)
+        for h in range(num_hashes):
+            sigmat[h][doc_index] = min(sigmat[h][doc_index], hash_funcs[h](last_s))
+            hashvals.append(sigmat[h][doc_index])
         
     return sigmat, docids
 
@@ -110,7 +117,14 @@ class MinHash:
         i = self._docids.index(di)
         j = self._docids.index(dj)
         # FINISH IMPLEMENTING THIS!!!
-        return 0.5
+        # |X|/|X+Y| = # common rows of docs / # all rows in docs
+        common_count = 0
+        all_count = self._mat.shape[0]*2 # sig matrix is hashes by documents
+        for h in range(self._mat.shape[0]):
+            if self._mat[h][i] == self._mat[h][j]:
+                common_count += 1
+        js = common_count / all_count
+        return js
     
     def save_matrix(self, file):
         np.save(file, self._mat)
