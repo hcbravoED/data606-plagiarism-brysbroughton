@@ -72,9 +72,19 @@ def _make_minhash_sigmatrix(shingled_data, num_hashes, inverted=False):
     for s, docid in inv_index:
         # s is a tuple (shingle, docid), docid is a doc where it appears
         # is this equivalent to iterating the cells of characteristic matrix that have a 1?
-        last_s += 1
-        #if s[1] == docid:
+        
         doc_index = docids.index(docid)
+        
+        #same shingle - reuse the stored hashvals
+        if s == last_s:
+            for h in range(num_hashes):
+                sigmat[h][doc_index] = min(sigmat[h][doc_index], hashvals[h])
+            continue
+        
+        #compute new hashes
+        last_s = s
+        hashvals = []
+
         for h in range(num_hashes):
             sigmat[h][doc_index] = min(sigmat[h][doc_index], hash_funcs[h](last_s))
             hashvals.append(sigmat[h][doc_index])
