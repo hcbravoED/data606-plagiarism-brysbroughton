@@ -43,21 +43,42 @@ def _do_lsh(mh_matrix, threshold):
     b, _ = _choose_nbands(threshold, n)
     r = int(n / b)
     print ("Using %d bands for %d rows" % (b, n))
+    #print ("r: %d" % r)
     
     ndocs = len(mh_matrix._docids)
     
     # generate a random hash function that takes vectors of length r as input
-    hash_func = _make_vector_hash(r)
+    #hash_func = _make_vector_hash(r) #what is r for?
+    hash_func = _make_vector_hash(n)
     
-    # initalize list of hashtables, will be populated with one hashtable
-    # per band
+    # initalize list of hashtables, will be populated with one hashtable (python dictionary)
+    # per band, each band has a hashtable to the buckets
     buckets = []
     
     # fill hash tables for each band
+    #print(mh_matrix._mat.shape)
     for band in range(b):
-       # FINISH IMPLEMENTING THIS LOOP
+        # FINISH IMPLEMENTING THIS LOOP
+        #Create hash table for the band
+        hashtable = {}
+        # iterate the cols to hash the range of rows at that col
+        for col in range(ndocs - 1):
+            band_start_index = band*n
+            band_end_index = band_start_index
+            #print('%d : %d' % (band_start_index, band_end_index))
+            #print(len(mh_matrix._mat[col][band_start_index:band_end_index]))
+            try:
+                _hash = hash_func(mh_matrix._mat[col][band_start_index:band_end_index])
+                if _hash in hashtable.keys():
+                    hashtable[_hash].append(mh_matrix._docids[col])
+                else:
+                    hashtable[_hash] = [mh_matrix._docids[col]]
+            except IndexError:
+                pass
+        buckets.append(hashtable)
+    #print(buckets)
     return buckets
-        
+
 def _get_candidates(hashtables):
     candidates = set()
     for hashtable in hashtables:

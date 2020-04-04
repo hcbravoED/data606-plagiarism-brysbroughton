@@ -56,9 +56,11 @@ def _make_hashes(n):
 #    hash_val = f([1, 2, 3])
 def _make_vector_hash(n, m=DEFAULT_M):
     hfuncs = _make_hashes(n)
+    #print('make vector hashes : %d' % n)
     def _f(x):
         acc = 0
         for i in range(len(x)):
+            #print(i)
             h = hfuncs[i]
             acc += h(x[i])
         return acc % m
