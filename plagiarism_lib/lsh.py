@@ -37,13 +37,15 @@ def _choose_nbands(t, n):
     return b, final_t
 
 def _do_lsh(mh_matrix, threshold):
-    n = mh_matrix._num_hashes
+    #n = mh_matrix._num_hashes
+    n = mh_matrix._mat.shape[1]
     
     # choose the number of bands, and rows per band to use in LSH
-    b, _ = _choose_nbands(threshold, n)
+    #b, _ = _choose_nbands(threshold, n)
+    b, _ = _choose_nbands(threshold, mh_matrix._num_hashes)
     r = int(n / b)
     print ("Using %d bands for %d rows" % (b, n))
-    #print ("r: %d" % r)
+    print ("r: %d" % r)
     
     ndocs = len(mh_matrix._docids)
     
@@ -61,18 +63,22 @@ def _do_lsh(mh_matrix, threshold):
         # FINISH IMPLEMENTING THIS LOOP
         #Create hash table for the band
         hashtable = {}
+        band_start_index = band*r
+        band_end_index = band_start_index + r - 1
+        #print('%d : %d' % (band_start_index, band_end_index))
+        #print(len(mh_matrix._mat[col][band_start_index:band_end_index]))
         # iterate the cols to hash the range of rows at that col
         for col in range(ndocs - 1):
-            band_start_index = band*n
-            band_end_index = band_start_index
-            #print('%d : %d' % (band_start_index, band_end_index))
-            #print(len(mh_matrix._mat[col][band_start_index:band_end_index]))
             try:
                 _hash = hash_func(mh_matrix._mat[col][band_start_index:band_end_index])
+                #print('hash:')
+                #print(_hash)
                 if _hash in hashtable.keys():
-                    hashtable[_hash].append(mh_matrix._docids[col])
+                    #hashtable[_hash].append(mh_matrix._docids[col])
+                    hashtable[mh_matrix._docids[col]].append(_hash)
                 else:
-                    hashtable[_hash] = [mh_matrix._docids[col]]
+                    #hashtable[_hash] = [mh_matrix._docids[col]]
+                    hashtable[mh_matrix._docids[col]] = [_hash]
             except IndexError:
                 pass
         buckets.append(hashtable)

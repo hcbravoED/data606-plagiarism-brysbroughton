@@ -21,8 +21,12 @@ def _read_truthfile(filepath):
 
 def _get_stats(candidate_pairs, truth_pairs):
     tp = len(candidate_pairs.intersection(truth_pairs))    
-    prec = 1.0 * tp / len(candidate_pairs)
-    rec = 1.0 * tp / len(truth_pairs)
+    
+    len_candidate_pairs = len(candidate_pairs)
+    len_truth_pairs = len(truth_pairs)
+    
+    prec = 1.0 * tp / len_candidate_pairs if len_candidate_pairs > 0 else 1 #len(candidate_pairs)
+    rec = 1.0 * tp / len_truth_pairs if len_truth_pairs > 0 else 1 #len(truth_pairs)
     print ("  returned: %d, tp=%.4f, prec=%.4f, rec=%.4f" % (len(candidate_pairs), tp, prec, rec))
     return prec, rec
 
